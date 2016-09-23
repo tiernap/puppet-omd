@@ -23,6 +23,7 @@
 {
    case $::osfamily {
     debian : { 
+      
       exec {'/usr/sbin/a2enmod ssl':
         require => Package[omd],
         creates => '/etc/apache2/mods-enabled/ssl.conf',
@@ -32,7 +33,14 @@
         require => Package[omd],
         creates => '/etc/apache2/mods-enabled/headers.load',
       }
-
+      exec {'/usr/sbin/a2enmod proxy':
+        require => Package[omd],
+        creates => '/etc/apache2/mods-enabled/proxy.load',
+      }
+      exec {'/usr/sbin/a2enmod proxy_http':
+        require => Package[omd],
+        creates => '/etc/apache2/mods-enabled/proxy_http.load',
+      }
       file { "/etc/apache2/sites-available/zzzz_omd_ssl.conf":
         require => Exec['/usr/sbin/a2enmod ssl'],
         content => template('omd/ssl/vhost.erb'),
