@@ -27,6 +27,11 @@
         require => Package[omd],
         creates => '/etc/apache2/mods-enabled/ssl.conf',
       }
+      
+      exec {'/usr/sbin/a2enmod headers':
+        require => Package[omd],
+        creates => '/etc/apache2/mods-enabled/headers.load',
+      }
 
       file { "/etc/apache2/sites-available/zzzz_omd_ssl.conf":
         require => Exec['/usr/sbin/a2enmod ssl'],
