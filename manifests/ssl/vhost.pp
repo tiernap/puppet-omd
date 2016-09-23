@@ -20,11 +20,38 @@
   $priority='zzzz'
 
  )
-  {
-   include ::apache::ssl
-   ::apache::custom_config { 'omd_ssl':
-      ensure   => present,
-      content  => template('omd/ssl/vhost.erb'),
-      priority => $priority,
+{
+   case $::osfamily {
+    debian : { 
+      exec {'/usr/sbin/a2enmod ssl':
+        require => Package[omd],
+        creates => '/etc/apache2/mods-enabled/ssl.conf',
+      }
+
+      file { "/etc/apache2/sites-available/zzzz_omd_ssl.conf":
+        require => Exec['/usr/sbin/a2enmod ssl'],
+        content => template('omd/ssl/vhost.erb'),
+        mode    => '644',
+        notify  => Service[omd],
+      }
+
+      exec {'/usr/sbin/a2ensite zzzz_omd_ssl':
+        require => File['/etc/apache2/sites-available/zzzz_omd_ssl.conf'],
+        creates => '/etc/apache2/sites-enabled/zzzz_omd_ssl.conf',
+        notify  => Service[omd],
+      }
     }
+
+    redhat : { 
+      file { '/etc/httpd/conf.d/zzzz_omd_ssl.conf':
+        require => Package[httpd],
+        content => template('omd/ssl/vhost.erb'),
+        mode => '644',
+        notify => Service[httpd],
+      }
+    }
+
+    default : { fail("unsupported os family : $::osfamily")}
+  }
  }
+
