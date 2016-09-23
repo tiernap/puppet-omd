@@ -58,11 +58,11 @@ class omd(
   }
 
   #include apache module
-  include apache
-  include apache::mod::ssl
-  include apache::mod::proxy
-  include apache::mod::proxy_http
-  include apache::mod::headers
+#  include apache
+#  include apache::mod::ssl
+#  include apache::mod::proxy
+#  include apache::mod::proxy_http
+#  include apache::mod::headers
 
   #change omd base installation if needed - and ensure basedir/omd exists
   if($basedir) {
